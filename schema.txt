@@ -1,0 +1,135 @@
+ERP - Schema 
+
+Relations - 
+category 
+	has_many category_items
+	has_many items
+
+category_items
+	belongs_to category
+	belongs_to item
+item 
+	has_many variants 
+	has_many category_items
+	has_many categories
+variant
+	belongs_to item 
+	sku (integer column to keep the stock count)
+company
+	has_many company_variants
+
+users
+	
+company_users
+	belongs_to company
+	belongs_to user	
+company_variants
+	belongs_to company
+	belongs_to variant 
+
+orders
+	has_many order_items
+	total
+	due
+order_items 
+	belongs_to order
+	belongs_to company_variant
+	quantity
+	price
+
+productions
+	has_many production_items (input - self join)
+	has_many production_items (output - self join)
+	start_time
+	end_time
+	output_quality (enum)
+	output_produced (in units) —> updates the Stocks after every production
+
+production_items
+	belongs_to production
+	belongs_to company_variant
+	quantity
+
+sales 
+	has_many sale_items
+	belongs_to seller (company)
+	belongs_to buyer (company)
+sale_items
+	belong_to sale
+	belongs_to company variant
+	quantity (in units)
+	price
+
+notifications  (triggers on required models)
+	belongs_to notifiable - polymorphic 
+
+
+Fields - 
+
+users - 
+	first_name
+	last_name 
+	email
+	password
+	dob - date
+	user_type - enum (admin, owner, manager)
+	gender
+	mobile
+
+company
+	- name
+	- address_details
+
+company_users
+	user_id
+	company_id
+
+company_variants
+	company_id
+	variant_id
+item
+	- name
+category 
+	- name
+category_items
+	- category_id
+	- item_id
+variant
+	- item_id
+	- name
+production
+	- output_produced 
+	- output_type
+	- output_quality
+	- start_time
+	- end_time
+	- managed_by (user_id)
+
+production_items 
+	- production_id
+	- company_variant_id
+	- quantity
+	- callbacks to update stocks after commit - (both input and output)
+sales 
+	- company_id (seller_company’s id)
+	- billing_details
+sale_items
+	- sale_id
+	- company_variant_id
+	- quantity
+	- price
+notification
+	- notifiable_id
+	- notifiable_type
+
+order
+	- company_id (self_id)
+	- total_amount
+	- due
+	- status (not_paid, completed)
+	
+order_items
+	- order_id
+	- quantity
+	- price
+	- company_variant_id
